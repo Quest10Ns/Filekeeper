@@ -20,3 +20,13 @@ output_type = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='По категориям', callback_data='by_catas'),
      InlineKeyboardButton(text='Все файлы', callback_data='all_files')]])
 
+async def get_catas():
+    all_cata = await get_categories()
+    keyboard = InlineKeyboardBuilder()
+    categoties = []
+    for category in all_cata:
+        if category.category not in categoties:
+            categoties.append(category.category)
+    for cata in categoties:
+        keyboard.add(InlineKeyboardButton(text=f'{cata}', callback_data=f'category_{cata}'))
+    return keyboard.as_markup()

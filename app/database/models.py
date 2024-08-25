@@ -27,7 +27,7 @@ class Category(Base):
     __tablename__ = 'categories'
     id: Mapped[int] = mapped_column(primary_key=True)
     category = mapped_column(String(150), nullable=True)
-
+    user_id = mapped_column(ForeignKey('users.id'))
 class Lab(Base):
     __tablename__ = 'Labs'
     id: Mapped[int] = mapped_column(primary_key=True)
