@@ -34,3 +34,9 @@ class Lab(Base):
     category_id = mapped_column(ForeignKey('categories.id'))
     name = mapped_column(String(200), nullable=True)
     description = mapped_column(Text, nullable=True)
+    url = mapped_column(String(500), nullable=True)
+
+
+async def async_main():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)

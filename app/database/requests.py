@@ -1,6 +1,6 @@
 import os
 from app.database.models import async_session
-from app.database.models import User, Category
+from app.database.models import User, Category, Lab
 from sqlalchemy import select, update, delete, and_
 from datetime import datetime, time, date
 import time as tim
@@ -41,3 +41,13 @@ async def add_category(category, tg_id):
 async def get_categories():
     async with async_session() as session:
         return await session.scalars(select(Category))
+
+async def set_category_id_for_item(category, tg_id):
+    async with async_session() as session:
+        user = await session.scalar(select(User).filter(User.telegram_id == tg_id))
+        if user:
+            print(category)
+            cata = await session.scalar(select(Category).filter(and_(Category.category == category, Category.user_id == user.id)))
+            if cata:
+                session.add(Lab(category_id = cata.id))
+                await session.commit()

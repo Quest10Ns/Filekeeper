@@ -30,3 +30,15 @@ async def get_catas():
     for cata in categoties:
         keyboard.add(InlineKeyboardButton(text=f'{cata}', callback_data=f'category_{cata}'))
     return keyboard.as_markup()
+
+
+async def get_catas_edit():
+    all_cata = await get_categories()
+    keyboard = InlineKeyboardBuilder()
+    categoties = []
+    for category in all_cata:
+        if category.category not in categoties:
+            categoties.append(category.category)
+    for cata in categoties:
+        keyboard.add(InlineKeyboardButton(text=f'{cata}', callback_data=f'category_edit_{cata}'))
+    return keyboard.as_markup()
