@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, InlineKeyboardMarkup, \
     InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
+import boto3
 
 class setCategory(StatesGroup):
     category = State()
@@ -88,7 +89,7 @@ async def add_file(message: types.Message, state: FSMContext):
 async def add_item(callback: types.CallbackQuery, state: FSMContext):
     callback_data = callback.data
     callback_data = callback_data[14::]
-    await rq.set_category_id_for_item(callback_data)
+    await rq.set_category_id_for_item(callback_data, callback.from_user.id)
     await state.set_state(setItem.name)
     await callback.message.answer('Введите название')
 
@@ -101,15 +102,15 @@ async def set_item_name(message: types.Message, state: FSMContext):
 @router.message(setItem.description)
 async def set_item_description(message: types.Message, state: FSMContext):
     await state.update_data(description=message.text)
-    await state.set_state(setItem.file)
-    await message.answer('Отправьте файл')
-
-@router.message(setItem.file)
-async def set_item_description(message: types.Message, state: FSMContext):
-    await state.update_data(file=message.text)
     data = await state.get_data()
-    await rq.set_other_data_about_item(data["name"], data["description"], data["price"])
-    await message.answer(
-        f'Назввание: {data["name"]}\nОписание: {data["description"]}\n',
-        reply_markup=kb.main_buttuns)
+    await message.answer('Отправьте файл')
     await state.clear()
+
+@router.message(F.document)
+async def handle_document(message: types.Message, bot: Bot):
+    file_id = message.document.file_id
+    file_name = message.document.file_name
+    file = await bot.get_file(file_id)
+    file_path = file.file_path
+    await bot.download_file(file_path, f'files/{file_name}')
+    await message.reply('File received and processed successfully.')

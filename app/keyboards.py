@@ -40,5 +40,6 @@ async def get_catas_edit():
         if category.category not in categoties:
             categoties.append(category.category)
     for cata in categoties:
-        keyboard.add(InlineKeyboardButton(text=f'{cata}', callback_data=f'category_edit_{cata}'))
+        cata_clean = re.sub(r'[^A-Za-z0-9_-]', '_', cata)
+        keyboard.add(InlineKeyboardButton(text=f'{cata}', callback_data=f'category_edit_{cata_clean}'))
     return keyboard.as_markup()
